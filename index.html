@@ -60,11 +60,22 @@
 
       <!-- 結果カード -->
       <section class="card result-card" id="resultCard" aria-live="polite">
+        <div class="result-header">
+          <div class="result-header-left">TODAY</div>
+          <div class="result-header-right">
+            <span id="todayDateDisplay" class="date-en"></span>
+          </div>
+        </div>
+
         <div class="result-main" id="mainCountText">
           イベントを入力して「カウントする」を押してください
         </div>
+
         <div class="result-sub" id="eventTitleDisplay"></div>
-        <div class="result-sub date" id="eventDateDisplay"></div>
+
+        <div class="result-sub date">
+          <span id="eventDateDisplay" class="date-en"></span>
+        </div>
       </section>
 
       <!-- アクションエリア -->
