@@ -1,14 +1,24 @@
 :root {
-  /* カラーパレット（ナチュラル系） */
+  /* デフォルトは寒色系テーマ */
   --bg-main: #f4f8fb;
   --card-bg: #ffffff;
   --accent: #4a90e2;
+  --accent-soft: rgba(74, 144, 226, 0.08);
   --text-main: #223146;
   --text-sub: #666666;
   --error: #e53935;
   --border-soft: #dde5ee;
 
   --shadow-soft: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+/* 暖色系テーマのオーバーライド */
+body.theme-warm {
+  --bg-main: #fff7f3;
+  --card-bg: #ffffff;
+  --accent: #ff7f50; /* コーラル系 */
+  --accent-soft: rgba(255, 127, 80, 0.08);
+  --text-main: #503028;
 }
 
 /* 全体レイアウト */
@@ -71,14 +81,12 @@ body {
 
 /* 入力カード */
 
-.input-card .form-group {
-  margin-bottom: 12px;
+.input-card {
+  border-left: 4px solid var(--accent);
 }
 
-.label-row {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
+.input-card .form-group {
+  margin-bottom: 12px;
 }
 
 .input-card label {
@@ -113,26 +121,43 @@ input[type="text"]:focus,
 input[type="date"]:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.15);
+  box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
-/* チェックボックス */
+/* テーマ切り替え */
 
-.checkbox-group {
-  margin-top: 4px;
+.theme-group {
+  margin-top: 8px;
 }
 
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.9rem;
+.theme-label {
+  margin: 0 0 4px;
+  font-size: 0.85rem;
   color: var(--text-sub);
 }
 
-.checkbox-label input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
+.theme-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.theme-btn {
+  flex: 1;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background-color: #ffffff;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--text-sub);
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.theme-btn.active {
+  border-color: var(--accent);
+  background-color: var(--accent-soft);
+  color: var(--accent);
 }
 
 /* エラーメッセージ */
@@ -148,13 +173,14 @@ input[type="date"]:focus {
 
 .result-card {
   text-align: center;
+  border-left: 4px solid var(--accent);
 }
 
 .result-main {
   font-size: 2.1rem;
   font-weight: 800;
   margin-bottom: 8px;
-  color: var(--text-main);
+  color: var(--accent); /* テーマカラーを適用 */
   word-break: keep-all;
 }
 
@@ -166,13 +192,6 @@ input[type="date"]:focus {
 
 .result-sub.date {
   font-size: 0.9rem;
-}
-
-.result-dday {
-  margin-top: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--accent);
 }
 
 /* ボタン */
@@ -190,18 +209,18 @@ input[type="date"]:focus {
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: transform 0.06s ease, box-shadow 0.06s ease, background-color 0.12s ease;
+  transition: transform 0.06s ease, box-shadow 0.06s ease, background-color 0.12s ease, color 0.12s ease;
 }
 
 .primary-btn {
   background-color: var(--accent);
   color: #ffffff;
-  box-shadow: 0 3px 8px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18);
 }
 
 .primary-btn:active {
   transform: translateY(1px);
-  box-shadow: 0 1px 4px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
 }
 
 .outline-btn {
@@ -209,10 +228,22 @@ input[type="date"]:focus {
   color: var(--accent);
   border: 1px solid var(--accent);
   box-shadow: none;
+  margin-bottom: 8px;
 }
 
 .outline-btn:active {
-  background-color: rgba(74, 144, 226, 0.08);
+  background-color: var(--accent-soft);
+}
+
+.secondary-btn {
+  background-color: #ffffff;
+  color: var(--accent);
+  border: 1px solid var(--border-soft);
+  box-shadow: none;
+}
+
+.secondary-btn:active {
+  background-color: var(--accent-soft);
 }
 
 /* アクションエリア */
@@ -225,6 +256,10 @@ input[type="date"]:focus {
   margin: 8px 4px 0;
   font-size: 0.8rem;
   color: var(--text-sub);
+}
+
+.bookmark-hint {
+  margin-top: 4px;
 }
 
 /* 補足説明 */
