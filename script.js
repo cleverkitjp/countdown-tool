@@ -49,7 +49,7 @@ themeButtons.forEach((btn) => {
   });
 });
 
-// ===== 関数群 =====
+// ===== 関数群（前半） =====
 
 // URLパラメータから title/date/theme を復元
 function initFromUrlParams() {
@@ -122,7 +122,7 @@ function handleCalculate() {
   currentDiffDays = diffDays;
 
   // 表示テキスト生成
-  const mainText = buildMainText(diffDays); // 「あと◯日」「本日」「◯日経過」
+  const mainText = buildMainText(diffDays);
   const formattedEventDate = formatDateEnWithWeekday(targetDate);
   const titleForDisplay = title || "";
 
@@ -155,7 +155,7 @@ function updateUrlParams(title, rawDate, theme) {
     }
 
     if (rawDate) {
-      params.set("date", rawDate); // YYYY-MM-DD
+      params.set("date", rawDate);
     } else {
       params.delete("date");
     }
@@ -174,7 +174,8 @@ function updateUrlParams(title, rawDate, theme) {
   } catch (e) {
     // 非対応なら何もしない
   }
-}
+  }
+// ===== 関数群（後半） =====
 
 // テキストコピー処理
 function handleCopy() {
@@ -187,7 +188,7 @@ function handleCopy() {
     navigator.clipboard
       .writeText(lastCopyText)
       .then(() => {
-        alert("カウント結果をコピーしました。お好きなアプリに貼り付けて使ってください。");
+        alert("カウント結果をコピーしました。");
       })
       .catch(() => {
         fallbackCopy(lastCopyText);
@@ -197,7 +198,7 @@ function handleCopy() {
   }
 }
 
-// 画像共有処理：結果カードをInstagram向けスクエア画像にして共有/ダウンロード
+// 画像共有処理（Instagram向けスクエア 1080×1080）
 async function handleShareImage() {
   if (!resultCard || (!currentDiffDays && currentDiffDays !== 0)) {
     alert("まだカウント結果がありません。「カウントする」を押してください。");
@@ -205,52 +206,47 @@ async function handleShareImage() {
   }
 
   if (typeof html2canvas === "undefined") {
-    alert("画像生成用スクリプトの読み込みに失敗しました。");
+    alert("画像生成用スクリプト読み込みに失敗しました。");
     return;
   }
 
   try {
-    const cardElement = resultCard;
-    const cardCanvas = await html2canvas(cardElement, {
+    const cardCanvas = await html2canvas(resultCard, {
       backgroundColor: null,
       scale: 2
     });
 
-    const targetSize = 1080;
-    const outCanvas = document.createElement("canvas");
-    outCanvas.width = targetSize;
-    outCanvas.height = targetSize;
-    const ctx = outCanvas.getContext("2d");
+    const out = document.createElement("canvas");
+    const size = 1080;
+    out.width = size;
+    out.height = size;
+    const ctx = out.getContext("2d");
 
     const bgColor =
       getComputedStyle(document.body).getPropertyValue("--bg-main") || "#ffffff";
-    ctx.fillStyle = bgColor.trim() || "#ffffff";
-    ctx.fillRect(0, 0, targetSize, targetSize);
+    ctx.fillStyle = bgColor.trim();
+    ctx.fillRect(0, 0, size, size);
 
-    const cardWidth = cardCanvas.width;
-    const cardHeight = cardCanvas.height;
     const scale = Math.min(
-      (targetSize * 0.9) / cardWidth,
-      (targetSize * 0.9) / cardHeight
+      (size * 0.9) / cardCanvas.width,
+      (size * 0.9) / cardCanvas.height
     );
-    const drawWidth = cardWidth * scale;
-    const drawHeight = cardHeight * scale;
-    const dx = (targetSize - drawWidth) / 2;
-    const dy = (targetSize - drawHeight) / 2;
+    const dw = cardCanvas.width * scale;
+    const dh = cardCanvas.height * scale;
+    const dx = (size - dw) / 2;
+    const dy = (size - dh) / 2;
 
-    ctx.drawImage(cardCanvas, dx, dy, drawWidth, drawHeight);
+    ctx.drawImage(cardCanvas, dx, dy, dw, dh);
 
-    outCanvas.toBlob(async (blob) => {
+    out.toBlob(async (blob) => {
       if (!blob) {
-        alert("画像の生成に失敗しました。");
+        alert("画像生成に失敗しました。");
         return;
       }
 
-      const fileName = "countdown.png";
-      const file = new File([blob], fileName, { type: "image/png" });
+      const file = new File([blob], "countdown.png", { type: "image/png" });
 
-      // Web Share API が使える場合は共有
-      if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
           await navigator.share({
             files: [file],
@@ -258,57 +254,51 @@ async function handleShareImage() {
             text: lastCopyText || ""
           });
           return;
-        } catch (e) {
-          // キャンセルなどは無視し、ダウンロードにフォールバック
-        }
+        } catch (e) {}
       }
 
-      // 共有できない環境ではダウンロード
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = fileName;
+      a.download = "countdown.png";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-
-      alert("画像ファイルをダウンロードしました。Instagramなどにアップロードしてお使いください。");
     }, "image/png");
   } catch (e) {
-    console.error(e);
-    alert("画像の作成中にエラーが発生しました。再度お試しください。");
+    alert("画像生成中にエラーが発生しました。");
   }
 }
 
 // ===== DOMに依存しないユーティリティ =====
 
-// 日付入力（YYYY-MM-DD）から Date を生成
+// 日付入力（YYYY-MM-DD）からDate生成
 function parseDateFromInput(value) {
-  const parts = value.split("-");
-  if (parts.length !== 3) return null;
+  const p = value.split("-");
+  if (p.length !== 3) return null;
 
-  const year = Number(parts[0]);
-  const month = Number(parts[1]);
-  const day = Number(parts[2]);
+  const y = Number(p[0]);
+  const m = Number(p[1]);
+  const d = Number(p[2]);
 
-  if (!year || !month || !day) return null;
+  if (!y || !m || !d) return null;
 
-  const d = new Date(year, month - 1, day);
-  d.setHours(0, 0, 0, 0);
+  const date = new Date(y, m - 1, d);
+  date.setHours(0, 0, 0, 0);
 
   if (
-    d.getFullYear() !== year ||
-    d.getMonth() !== month - 1 ||
-    d.getDate() !== day
+    date.getFullYear() !== y ||
+    date.getMonth() !== m - 1 ||
+    date.getDate() !== d
   ) {
     return null;
   }
 
-  return d;
+  return date;
 }
 
-// 今日の日付（0:00）を取得
+// 今日（0:00）
 function getTodayAtMidnight() {
   const now = new Date();
   const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -316,26 +306,20 @@ function getTodayAtMidnight() {
   return d;
 }
 
-// 日数差分を計算
+// 日数差
 function calcDiffInDays(fromDate, toDate) {
-  const msPerDay = 1000 * 60 * 60 * 24;
-  const diffMs = toDate.getTime() - fromDate.getTime();
-  return Math.round(diffMs / msPerDay);
+  const ms = 1000 * 60 * 60 * 24;
+  return Math.round((toDate - fromDate) / ms);
 }
 
-// メイン表示用テキスト（「本日」を採用）
+// メイン表示テキスト（本日採用）
 function buildMainText(diffDays) {
-  if (diffDays > 0) {
-    return `あと ${diffDays} 日`;
-  } else if (diffDays === 0) {
-    return "本日";
-  } else {
-    const passed = Math.abs(diffDays);
-    return `${passed} 日経過`;
-  }
+  if (diffDays > 0) return `あと ${diffDays} 日`;
+  if (diffDays === 0) return "本日";
+  return `${Math.abs(diffDays)} 日経過`;
 }
 
-// 欧文風 日付＋英略曜日（例：2025/12/4 Thu.）
+// 欧文日付＋英略曜日（例：2025/12/4 Thu.）
 function formatDateEnWithWeekday(date) {
   const y = date.getFullYear();
   const m = date.getMonth() + 1;
@@ -344,39 +328,30 @@ function formatDateEnWithWeekday(date) {
   return `${y}/${m}/${d} ${w}`;
 }
 
-// コピー用テキスト生成
+// コピー用テキスト
 function buildCopyText(title, diffDays, formattedDate) {
-  const safeTitle = title || "このイベント";
-
-  if (diffDays > 0) {
-    const days = diffDays;
-    return `${safeTitle}まで あと${days}日（${formattedDate}）`;
-  } else if (diffDays === 0) {
-    return `本日「${safeTitle}」当日です。（${formattedDate}）`;
-  } else {
-    const passed = Math.abs(diffDays);
-    return `${safeTitle}から ${passed}日経過（${formattedDate}）`;
-  }
+  const t = title || "このイベント";
+  if (diffDays > 0) return `${t}まで あと${diffDays}日（${formattedDate}）`;
+  if (diffDays === 0) return `本日「${t}」当日（${formattedDate}）`;
+  return `${t}から ${Math.abs(diffDays)}日経過（${formattedDate}）`;
 }
 
-// クリップボードAPI非対応時のフォールバック
+// クリップボードAPI非対応フォールバック
 function fallbackCopy(text) {
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  textarea.style.position = "fixed";
-  textarea.style.left = "-9999px";
-  textarea.style.top = "0";
-  document.body.appendChild(textarea);
-  textarea.focus();
-  textarea.select();
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.left = "-9999px";
+  document.body.appendChild(ta);
+  ta.select();
 
   try {
     document.execCommand("copy");
-    alert("カウント結果をコピーしました。お好きなアプリに貼り付けて使ってください。");
+    alert("コピーしました。");
   } catch (e) {
-    alert("コピーに失敗しました。手動で選択してコピーしてください。");
+    alert("コピーできませんでした。");
   } finally {
-    document.body.removeChild(textarea);
+    document.body.removeChild(ta);
   }
 }
 
@@ -386,14 +361,9 @@ function fallbackCopy(text) {
   if (!footerEl) return;
 
   fetch("https://cleverkitjp.github.io/footer.html")
-    .then((res) => {
-      if (!res.ok) throw new Error("Footer load failed");
-      return res.text();
-    })
+    .then((res) => res.text())
     .then((html) => {
       footerEl.innerHTML = html;
     })
-    .catch(() => {
-      // 読み込み失敗時はプレースホルダのまま
-    });
+    .catch(() => {});
 })();
