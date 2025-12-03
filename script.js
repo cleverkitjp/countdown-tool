@@ -3,10 +3,10 @@ let lastCopyText = "";      // 直近のコピー用テキスト
 let currentDiffDays = null; // 直近の差分日数
 let currentTheme = "cool";  // "cool" | "warm"
 
-// 曜日配列（日本語）
-const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
+// 曜日配列（英略＋ピリオド）
+const WEEKDAYS_EN = ["Sun.", "Mon.", "Tue.", "Wed.", "Thu.", "Fri.", "Sat."];
 
-// ===== DOM 取得（scriptタグがbody末尾なので、ここで取得してOK） =====
+// ===== DOM 取得（scriptタグがbody末尾なのでここで取得してOK） =====
 const eventTitleInput = document.getElementById("eventTitle");
 const eventDateInput = document.getElementById("eventDate");
 const calculateButton = document.getElementById("calculateButton");
@@ -18,12 +18,14 @@ const resultCard = document.getElementById("resultCard");
 const mainCountText = document.getElementById("mainCountText");
 const eventTitleDisplay = document.getElementById("eventTitleDisplay");
 const eventDateDisplay = document.getElementById("eventDateDisplay");
+const todayDateDisplay = document.getElementById("todayDateDisplay");
 
 const themeButtons = document.querySelectorAll(".theme-btn");
 
-// ===== 初期化：URLパラメータから値を復元 =====
+// ===== 初期化：URLパラメータから値を復元＋今日の日付をヘッダーに表示 =====
 initFromUrlParams();
 applyTheme(currentTheme);
+setTodayHeader();
 
 // 日付が既に入っていれば自動計算（ブックマーク／再訪用）
 if (eventDateInput.value) {
@@ -74,6 +76,13 @@ function initFromUrlParams() {
   }
 }
 
+// ヘッダー（TODAY yyyy/m/d Ddd.）を表示
+function setTodayHeader() {
+  if (!todayDateDisplay) return;
+  const today = getTodayAtMidnight();
+  todayDateDisplay.textContent = formatDateEnWithWeekday(today);
+}
+
 // テーマ適用
 function applyTheme(theme) {
   currentTheme = theme === "warm" ? "warm" : "cool";
@@ -113,18 +122,18 @@ function handleCalculate() {
   currentDiffDays = diffDays;
 
   // 表示テキスト生成
-  const mainText = buildMainText(diffDays);
-  const formattedDate = formatDateWithWeekday(targetDate);
+  const mainText = buildMainText(diffDays); // 「あと◯日」「本日」「◯日経過」
+  const formattedEventDate = formatDateEnWithWeekday(targetDate);
   const titleForDisplay = title || "";
 
   // 結果カードに反映
   mainCountText.textContent = mainText;
   eventTitleDisplay.textContent = titleForDisplay;
   eventTitleDisplay.style.display = titleForDisplay ? "block" : "none";
-  eventDateDisplay.textContent = formattedDate;
+  eventDateDisplay.textContent = formattedEventDate;
 
   // コピー用テキストを保存
-  lastCopyText = buildCopyText(title, diffDays, formattedDate);
+  lastCopyText = buildCopyText(title, diffDays, formattedEventDate);
 
   // URLパラメータを更新（ブックマーク用）
   updateUrlParams(title, rawDate, currentTheme);
@@ -314,25 +323,25 @@ function calcDiffInDays(fromDate, toDate) {
   return Math.round(diffMs / msPerDay);
 }
 
-// メイン表示用テキスト
+// メイン表示用テキスト（「本日」を採用）
 function buildMainText(diffDays) {
   if (diffDays > 0) {
     return `あと ${diffDays} 日`;
   } else if (diffDays === 0) {
-    return "今日！";
+    return "本日";
   } else {
     const passed = Math.abs(diffDays);
     return `${passed} 日経過`;
   }
 }
 
-// 日付＋曜日フォーマット（例：2025年3月10日（月））
-function formatDateWithWeekday(date) {
+// 欧文風 日付＋英略曜日（例：2025/12/4 Thu.）
+function formatDateEnWithWeekday(date) {
   const y = date.getFullYear();
   const m = date.getMonth() + 1;
   const d = date.getDate();
-  const w = WEEKDAYS[date.getDay()];
-  return `${y}年${m}月${d}日（${w}）`;
+  const w = WEEKDAYS_EN[date.getDay()];
+  return `${y}/${m}/${d} ${w}`;
 }
 
 // コピー用テキスト生成
@@ -343,7 +352,7 @@ function buildCopyText(title, diffDays, formattedDate) {
     const days = diffDays;
     return `${safeTitle}まで あと${days}日（${formattedDate}）`;
   } else if (diffDays === 0) {
-    return `きょうは「${safeTitle}」当日です！（${formattedDate}）`;
+    return `本日「${safeTitle}」当日です。（${formattedDate}）`;
   } else {
     const passed = Math.abs(diffDays);
     return `${safeTitle}から ${passed}日経過（${formattedDate}）`;
