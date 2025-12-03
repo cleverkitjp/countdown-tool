@@ -9,7 +9,7 @@
   --error: #e53935;
   --border-soft: #dde5ee;
 
-  --shadow-soft: 0 4px 10px rgba(0, 0, 0, 0.04);
+  --shadow-soft: 0 6px 14px rgba(0, 0, 0, 0.04);
 }
 
 /* 暖色系テーマのオーバーライド */
@@ -73,7 +73,7 @@ body {
 
 .card {
   background-color: var(--card-bg);
-  border-radius: 12px;
+  border-radius: 16px;
   box-shadow: var(--shadow-soft);
   padding: 16px 16px 18px;
   margin-bottom: 16px;
@@ -83,6 +83,7 @@ body {
 
 .input-card {
   border-left: 4px solid var(--accent);
+  min-height: 0;
 }
 
 .input-card .form-group {
@@ -172,26 +173,65 @@ input[type="date"]:focus {
 /* 結果カード */
 
 .result-card {
-  text-align: center;
   border-left: 4px solid var(--accent);
+  min-height: 210px; /* 画像化時のアスペクト比を意識して少し高さを確保 */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.result-main {
-  font-size: 2.1rem;
-  font-weight: 800;
-  margin-bottom: 8px;
-  color: var(--accent); /* テーマカラーを適用 */
-  word-break: keep-all;
+/* ヘッダー部分（TODAY + 今日の日付） */
+.result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 12px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  font-size: 0.8rem;
+  color: var(--text-sub);
 }
+
+.result-header-left {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+.result-header-right {
+  text-align: right;
+}
+
+/* 欧文風日付（today ＆ event） */
+.date-en {
+  font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: 0.03em;
+  font-size: 0.85rem;
+  color: var(--text-sub);
+}
+
+/* メイン「あと◯日」「本日」「◯日経過」 */
+
+.result-main {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 10px 0 6px;
+  color: var(--accent);
+  word-break: keep-all;
+  text-align: center;
+}
+
+/* イベント名＋イベント日 */
 
 .result-sub {
   font-size: 0.95rem;
   color: var(--text-sub);
   margin-bottom: 4px;
+  text-align: center;
 }
 
 .result-sub.date {
-  font-size: 0.9rem;
+  margin-top: 2px;
 }
 
 /* ボタン */
