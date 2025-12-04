@@ -6,7 +6,7 @@ let currentTheme = "cool";  // "cool" | "warm"
 // 曜日配列（英略＋ピリオド）
 const WEEKDAYS_EN = ["Sun.", "Mon.", "Tue.", "Wed.", "Thu.", "Fri.", "Sat."];
 
-// ===== DOM 取得（scriptタグがbody末尾なのでここで取得してOK） =====
+// ===== DOM 取得 =====
 const eventTitleInput = document.getElementById("eventTitle");
 const eventDateInput = document.getElementById("eventDate");
 const calculateButton = document.getElementById("calculateButton");
@@ -22,7 +22,7 @@ const todayDateDisplay = document.getElementById("todayDateDisplay");
 
 const themeButtons = document.querySelectorAll(".theme-btn");
 
-// ===== 初期化：URLパラメータから値を復元＋今日の日付をヘッダーに表示 =====
+// ===== 初期化 =====
 initFromUrlParams();
 applyTheme(currentTheme);
 setTodayHeader();
@@ -32,7 +32,7 @@ if (eventDateInput.value) {
   handleCalculate();
 }
 
-// ===== イベント登録 =====
+// イベント登録
 calculateButton.addEventListener("click", handleCalculate);
 copyButton.addEventListener("click", handleCopy);
 shareButton.addEventListener("click", handleShareImage);
@@ -49,7 +49,9 @@ themeButtons.forEach((btn) => {
   });
 });
 
-// ===== 関数群（前半） =====
+// =====================
+// 関数群（前半）
+// =====================
 
 // URLパラメータから title/date/theme を復元
 function initFromUrlParams() {
@@ -59,13 +61,8 @@ function initFromUrlParams() {
     const date = params.get("date");
     const theme = params.get("theme");
 
-    if (title) {
-      eventTitleInput.value = title;
-    }
-    if (date) {
-      eventDateInput.value = date;
-    }
-
+    if (title) eventTitleInput.value = title;
+    if (date) eventDateInput.value = date;
     if (theme === "warm" || theme === "cool") {
       currentTheme = theme;
     } else {
@@ -121,24 +118,19 @@ function handleCalculate() {
   const diffDays = calcDiffInDays(today, targetDate);
   currentDiffDays = diffDays;
 
-  // 表示テキスト生成
   const mainText = buildMainText(diffDays);
   const formattedEventDate = formatDateEnWithWeekday(targetDate);
   const titleForDisplay = title || "";
 
-  // 結果カードに反映
   mainCountText.textContent = mainText;
   eventTitleDisplay.textContent = titleForDisplay;
   eventTitleDisplay.style.display = titleForDisplay ? "block" : "none";
   eventDateDisplay.textContent = formattedEventDate;
 
-  // コピー用テキストを保存
   lastCopyText = buildCopyText(title, diffDays, formattedEventDate);
 
-  // URLパラメータを更新（ブックマーク用）
   updateUrlParams(title, rawDate, currentTheme);
 
-  // 念のため可視化
   resultCard.style.visibility = "visible";
   resultCard.style.opacity = "1";
 }
@@ -148,34 +140,25 @@ function updateUrlParams(title, rawDate, theme) {
   try {
     const params = new URLSearchParams(window.location.search);
 
-    if (title) {
-      params.set("title", title);
-    } else {
-      params.delete("title");
-    }
+    if (title) params.set("title", title);
+    else params.delete("title");
 
-    if (rawDate) {
-      params.set("date", rawDate);
-    } else {
-      params.delete("date");
-    }
+    if (rawDate) params.set("date", rawDate);
+    else params.delete("date");
 
-    if (theme === "warm" || theme === "cool") {
-      params.set("theme", theme);
-    } else {
-      params.delete("theme");
-    }
+    if (theme === "warm" || theme === "cool") params.set("theme", theme);
+    else params.delete("theme");
 
     const newQuery = params.toString();
     const newUrl =
       window.location.pathname + (newQuery ? "?" + newQuery : "");
 
     window.history.replaceState(null, "", newUrl);
-  } catch (e) {
-    // 非対応なら何もしない
-  }
-  }
-// ===== 関数群（後半） =====
+  } catch (e) {}
+}
+// =====================
+// 関数群（後半）
+// =====================
 
 // テキストコピー処理
 function handleCopy() {
@@ -187,12 +170,8 @@ function handleCopy() {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard
       .writeText(lastCopyText)
-      .then(() => {
-        alert("カウント結果をコピーしました。");
-      })
-      .catch(() => {
-        fallbackCopy(lastCopyText);
-      });
+      .then(() => alert("カウント結果をコピーしました。"))
+      .catch(() => fallbackCopy(lastCopyText));
   } else {
     fallbackCopy(lastCopyText);
   }
@@ -206,7 +185,7 @@ async function handleShareImage() {
   }
 
   if (typeof html2canvas === "undefined") {
-    alert("画像生成用スクリプト読み込みに失敗しました。");
+    alert("画像生成用スクリプトの読み込みに失敗しました。");
     return;
   }
 
@@ -216,8 +195,8 @@ async function handleShareImage() {
       scale: 2
     });
 
-    const out = document.createElement("canvas");
     const size = 1080;
+    const out = document.createElement("canvas");
     out.width = size;
     out.height = size;
     const ctx = out.getContext("2d");
@@ -240,13 +219,13 @@ async function handleShareImage() {
 
     out.toBlob(async (blob) => {
       if (!blob) {
-        alert("画像生成に失敗しました。");
+        alert("画像の生成に失敗しました。");
         return;
       }
 
       const file = new File([blob], "countdown.png", { type: "image/png" });
 
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
         try {
           await navigator.share({
             files: [file],
@@ -273,32 +252,17 @@ async function handleShareImage() {
 
 // ===== DOMに依存しないユーティリティ =====
 
-// 日付入力（YYYY-MM-DD）からDate生成
 function parseDateFromInput(value) {
   const p = value.split("-");
   if (p.length !== 3) return null;
-
-  const y = Number(p[0]);
-  const m = Number(p[1]);
-  const d = Number(p[2]);
-
+  const y = Number(p[0]), m = Number(p[1]), d = Number(p[2]);
   if (!y || !m || !d) return null;
-
   const date = new Date(y, m - 1, d);
   date.setHours(0, 0, 0, 0);
-
-  if (
-    date.getFullYear() !== y ||
-    date.getMonth() !== m - 1 ||
-    date.getDate() !== d
-  ) {
-    return null;
-  }
-
+  if (date.getFullYear() !== y || date.getMonth() !== m - 1 || date.getDate() !== d) return null;
   return date;
 }
 
-// 今日（0:00）
 function getTodayAtMidnight() {
   const now = new Date();
   const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -306,20 +270,17 @@ function getTodayAtMidnight() {
   return d;
 }
 
-// 日数差
 function calcDiffInDays(fromDate, toDate) {
   const ms = 1000 * 60 * 60 * 24;
   return Math.round((toDate - fromDate) / ms);
 }
 
-// メイン表示テキスト（本日採用）
 function buildMainText(diffDays) {
   if (diffDays > 0) return `あと ${diffDays} 日`;
   if (diffDays === 0) return "本日";
   return `${Math.abs(diffDays)} 日経過`;
 }
 
-// 欧文日付＋英略曜日（例：2025/12/4 Thu.）
 function formatDateEnWithWeekday(date) {
   const y = date.getFullYear();
   const m = date.getMonth() + 1;
@@ -328,15 +289,13 @@ function formatDateEnWithWeekday(date) {
   return `${y}/${m}/${d} ${w}`;
 }
 
-// コピー用テキスト
 function buildCopyText(title, diffDays, formattedDate) {
   const t = title || "このイベント";
   if (diffDays > 0) return `${t}まで あと${diffDays}日（${formattedDate}）`;
-  if (diffDays === 0) return `本日「${t}」当日（${formattedDate}）`;
+  if (diffDays === 0) return `本日「${t}」当日です。（${formattedDate}）`;
   return `${t}から ${Math.abs(diffDays)}日経過（${formattedDate}）`;
 }
 
-// クリップボードAPI非対応フォールバック
 function fallbackCopy(text) {
   const ta = document.createElement("textarea");
   ta.value = text;
@@ -344,7 +303,6 @@ function fallbackCopy(text) {
   ta.style.left = "-9999px";
   document.body.appendChild(ta);
   ta.select();
-
   try {
     document.execCommand("copy");
     alert("コピーしました。");
@@ -355,13 +313,16 @@ function fallbackCopy(text) {
   }
 }
 
-// 共通フッター読み込み
+// 共通フッター読み込み（404ページは埋め込まない）
 (function loadCommonFooter() {
   const footerEl = document.getElementById("commonFooter");
   if (!footerEl) return;
 
   fetch("https://cleverkitjp.github.io/footer.html")
-    .then((res) => res.text())
+    .then((res) => {
+      if (!res.ok) throw new Error("Footer not found");
+      return res.text();
+    })
     .then((html) => {
       footerEl.innerHTML = html;
     })
