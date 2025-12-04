@@ -319,6 +319,7 @@ input[type="date"]:focus {
   padding-left: 20px;
   font-size: 0.9rem;
   color: var(--text-sub);
+  list-style: disc;
 }
 
 .explain-list li {
@@ -344,6 +345,6 @@ input[type="date"]:focus {
   }
 
   .header {
-    text-align: center;
+    text堂: center;
   }
 }
