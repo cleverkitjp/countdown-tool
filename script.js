@@ -99,7 +99,7 @@ function applyTheme(theme) {
 // メイン処理：カウント計算
 function handleCalculate() {
   errorMessage.textContent = "";
-
+  mainCountText.classList.remove("has-result");  // ← 追加
   const rawDate = eventDateInput.value;
   const title = eventTitleInput.value.trim();
 
@@ -123,6 +123,7 @@ function handleCalculate() {
   const titleForDisplay = title || "";
 
   mainCountText.textContent = mainText;
+  mainCountText.classList.add("has-result");  // ← 追加
   eventTitleDisplay.textContent = titleForDisplay;
   eventTitleDisplay.style.display = titleForDisplay ? "block" : "none";
   eventDateDisplay.textContent = formattedEventDate;
