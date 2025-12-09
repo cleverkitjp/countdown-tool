@@ -211,15 +211,21 @@ input[type="date"]:focus {
 }
 
 /* メイン「あと◯日」「本日」「◯日経過」 */
-
 .result-main {
-  font-size: 2.2rem;
-  font-weight: 800;
+  font-size: 1.1rem;          /* ← プレースホルダ用の標準サイズに変更 */
+  font-weight: 600;
   margin: 10px 0 6px;
   color: var(--accent);
   word-break: keep-all;
   text-align: center;
 }
+
+/* 結果が出たときにだけ大きくする */
+.result-main.has-result {
+  font-size: 2.2rem;
+  font-weight: 800;
+}
+
 
 /* イベント名＋イベント日 */
 
