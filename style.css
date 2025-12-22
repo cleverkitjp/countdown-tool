@@ -57,17 +57,6 @@ body {
   overflow: hidden;
 }
 
-.bg-layer.has-image::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: var(--bg-image);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  opacity: var(--bg-opacity);
-}
-
 /* ヘッダー */
 
 .header {
@@ -270,7 +259,7 @@ input[type="date"]:focus {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: var(--card-opacity);
+  opacity: var(--bg-opacity);
   border-radius: 16px;
   z-index: 0;
 }
