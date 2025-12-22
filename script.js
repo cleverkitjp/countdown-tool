@@ -106,9 +106,9 @@ function setTodayHeader() {
 // 背景画像＆透明度コントロール初期化
 function initBgControls() {
   if (bgOpacityInput) {
-    updateBgOpacity(bgOpacityInput.value || 80);
+    updateBgOpacity(bgOpacityInput.value || 25);
   } else {
-    updateBgOpacity(80);
+    updateBgOpacity(25);
   }
 
   if (clearBgButton) {
@@ -119,8 +119,8 @@ function initBgControls() {
 function updateBgOpacity(value) {
   const raw = Number(value);
   const clamped = Number.isFinite(raw)
-    ? Math.min(100, Math.max(40, raw))
-    : 80;
+    ? Math.min(100, Math.max(0, raw))
+    : 25;
   const normalized = clamped / 100;
   const bgValue = getComputedStyle(document.documentElement)
     .getPropertyValue("--bg-image")
@@ -171,7 +171,7 @@ function applyBackgroundImage(dataUrl) {
   if (bgLayer) bgLayer.classList.add("has-image");
   if (resultCard) resultCard.classList.add("has-bg-image");
   if (clearBgButton) clearBgButton.removeAttribute("disabled");
-  updateBgOpacity(bgOpacityInput ? bgOpacityInput.value : 80);
+  updateBgOpacity(bgOpacityInput ? bgOpacityInput.value : 25);
 }
 
 function clearBgImage() {
@@ -179,7 +179,7 @@ function clearBgImage() {
   if (bgLayer) bgLayer.classList.remove("has-image");
   if (resultCard) resultCard.classList.remove("has-bg-image");
   if (clearBgButton) clearBgButton.setAttribute("disabled", "true");
-  updateBgOpacity(bgOpacityInput ? bgOpacityInput.value : 80);
+  updateBgOpacity(bgOpacityInput ? bgOpacityInput.value : 25);
 }
 
 // テーマ適用
