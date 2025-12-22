@@ -8,6 +8,9 @@
   --text-sub: #666666;
   --error: #e53935;
   --border-soft: #dde5ee;
+  --bg-image: none;
+  --bg-opacity: 0.8;
+  --card-opacity: 0.88;
 
   --shadow-soft: 0 6px 14px rgba(0, 0, 0, 0.04);
 }
@@ -32,7 +35,7 @@ body.theme-warm {
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--bg-main);
+  background-color: transparent;
   color: var(--text-main);
   font-family: "Noto Sans JP", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -42,6 +45,28 @@ body {
   max-width: 480px;
   margin: 0 auto;
   padding: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  background-color: var(--bg-main);
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg-layer.has-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--bg-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: var(--bg-opacity);
 }
 
 /* ヘッダー */
@@ -72,7 +97,8 @@ body {
 /* カード共通 */
 
 .card {
-  background-color: var(--card-bg);
+  position: relative;
+  background-color: rgba(255, 255, 255, var(--card-opacity));
   border-radius: 16px;
   box-shadow: var(--shadow-soft);
   padding: 16px 16px 18px;
@@ -88,6 +114,13 @@ body {
 
 .input-card .form-group {
   margin-bottom: 12px;
+}
+
+.bg-group {
+  border: 1px dashed var(--border-soft);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background-color: rgba(255, 255, 255, 0.7);
 }
 
 .input-card label {
@@ -123,6 +156,56 @@ input[type="date"]:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.bg-group input[type="file"] {
+  padding: 8px 10px;
+  background-color: #ffffff;
+}
+
+.bg-opacity-control {
+  margin-top: 10px;
+}
+
+.range-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-sub);
+  margin-bottom: 4px;
+}
+
+.range-value {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+#bgOpacityInput {
+  width: 100%;
+}
+
+.help-text {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  color: var(--text-sub);
+}
+
+.text-btn {
+  margin-top: 10px;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.text-btn:disabled {
+  color: #b5bdc9;
+  cursor: not-allowed;
 }
 
 /* テーマ切り替え */
@@ -178,6 +261,24 @@ input[type="date"]:focus {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.result-card.has-bg-image::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--bg-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: var(--card-opacity);
+  border-radius: 16px;
+  z-index: 0;
+}
+
+.result-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* ヘッダー部分（TODAY + 今日の日付） */
@@ -351,6 +452,6 @@ input[type="date"]:focus {
   }
 
   .header {
-    text堂: center;
+    text-align: center;
   }
 }
