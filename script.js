@@ -25,7 +25,6 @@ const bgImageInput = document.getElementById("bgImageInput");
 const bgOpacityInput = document.getElementById("bgOpacityInput");
 const bgOpacityValue = document.getElementById("bgOpacityValue");
 const clearBgButton = document.getElementById("clearBgButton");
-const bgLayer = document.getElementById("bgLayer");
 
 // ===== 初期化 =====
 initFromUrlParams();
@@ -168,7 +167,6 @@ function handleBgImageChange() {
 
 function applyBackgroundImage(dataUrl) {
   document.documentElement.style.setProperty("--bg-image", `url(${dataUrl})`);
-  if (bgLayer) bgLayer.classList.add("has-image");
   if (resultCard) resultCard.classList.add("has-bg-image");
   if (clearBgButton) clearBgButton.removeAttribute("disabled");
   updateBgOpacity(bgOpacityInput ? bgOpacityInput.value : 25);
@@ -176,7 +174,6 @@ function applyBackgroundImage(dataUrl) {
 
 function clearBgImage() {
   document.documentElement.style.setProperty("--bg-image", "none");
-  if (bgLayer) bgLayer.classList.remove("has-image");
   if (resultCard) resultCard.classList.remove("has-bg-image");
   if (clearBgButton) clearBgButton.setAttribute("disabled", "true");
   updateBgOpacity(bgOpacityInput ? bgOpacityInput.value : 25);
