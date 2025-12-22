@@ -35,7 +35,7 @@ body.theme-warm {
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--bg-main);
+  background-color: transparent;
   color: var(--text-main);
   font-family: "Noto Sans JP", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -45,6 +45,28 @@ body {
   max-width: 480px;
   margin: 0 auto;
   padding: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  background-color: var(--bg-main);
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg-layer.has-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--bg-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: var(--bg-opacity);
 }
 
 .bg-layer {
