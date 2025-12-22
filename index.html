@@ -22,6 +22,7 @@
 
 </head>
 <body>
+  <div class="bg-layer" id="bgLayer" aria-hidden="true"></div>
   <div class="page-wrapper">
     <header class="header">
       <h1 class="title">かんたん カウントダウン</h1>
@@ -60,6 +61,31 @@
               暖色系
             </button>
           </div>
+        </div>
+
+        <div class="form-group bg-group">
+          <label for="bgImageInput">背景画像（任意）</label>
+          <input type="file" id="bgImageInput" accept="image/*">
+
+          <div class="bg-opacity-control">
+            <div class="range-label-row">
+              <label for="bgOpacityInput">背景の透明度</label>
+              <span class="range-value" id="bgOpacityValue">25%</span>
+            </div>
+            <input
+              type="range"
+              id="bgOpacityInput"
+              min="0"
+              max="100"
+              step="1"
+              value="25"
+            >
+            <p class="help-text">背景画像の濃さを 0% 〜 100% で調整できます。</p>
+          </div>
+
+          <button type="button" class="text-btn" id="clearBgButton">
+            背景画像をクリア
+          </button>
         </div>
 
         <p id="errorMessage" class="error-message"></p>
