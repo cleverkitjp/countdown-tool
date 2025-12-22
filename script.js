@@ -21,11 +21,17 @@ const eventDateDisplay = document.getElementById("eventDateDisplay");
 const todayDateDisplay = document.getElementById("todayDateDisplay");
 
 const themeButtons = document.querySelectorAll(".theme-btn");
+const bgImageInput = document.getElementById("bgImageInput");
+const bgOpacityInput = document.getElementById("bgOpacityInput");
+const bgOpacityValue = document.getElementById("bgOpacityValue");
+const clearBgButton = document.getElementById("clearBgButton");
+const bgLayer = document.getElementById("bgLayer");
 
 // ===== 初期化 =====
 initFromUrlParams();
 applyTheme(currentTheme);
 setTodayHeader();
+initBgControls();
 
 // 日付が既に入っていれば自動計算（ブックマーク／再訪用）
 if (eventDateInput.value) {
@@ -48,6 +54,23 @@ themeButtons.forEach((btn) => {
     );
   });
 });
+
+if (bgImageInput) {
+  bgImageInput.addEventListener("change", handleBgImageChange);
+}
+
+if (bgOpacityInput) {
+  bgOpacityInput.addEventListener("input", () =>
+    updateBgOpacity(bgOpacityInput.value)
+  );
+}
+
+if (clearBgButton) {
+  clearBgButton.addEventListener("click", () => {
+    clearBgImage();
+    if (bgImageInput) bgImageInput.value = "";
+  });
+}
 
 // =====================
 // 関数群（前半）
@@ -78,6 +101,85 @@ function setTodayHeader() {
   if (!todayDateDisplay) return;
   const today = getTodayAtMidnight();
   todayDateDisplay.textContent = formatDateEnWithWeekday(today);
+}
+
+// 背景画像＆透明度コントロール初期化
+function initBgControls() {
+  if (bgOpacityInput) {
+    updateBgOpacity(bgOpacityInput.value || 80);
+  } else {
+    updateBgOpacity(80);
+  }
+
+  if (clearBgButton) {
+    clearBgButton.setAttribute("disabled", "true");
+  }
+}
+
+function updateBgOpacity(value) {
+  const raw = Number(value);
+  const clamped = Number.isFinite(raw)
+    ? Math.min(100, Math.max(40, raw))
+    : 80;
+  const normalized = clamped / 100;
+  const bgValue = getComputedStyle(document.documentElement)
+    .getPropertyValue("--bg-image")
+    .trim();
+  const hasImage = bgValue && bgValue.includes("url(");
+  const cardOpacity = hasImage ? Math.min(normalized + 0.1, 1) : 1;
+
+  document.documentElement.style.setProperty(
+    "--bg-opacity",
+    normalized.toFixed(2)
+  );
+  document.documentElement.style.setProperty(
+    "--card-opacity",
+    cardOpacity.toFixed(2)
+  );
+
+  if (bgOpacityInput && clamped !== raw) {
+    bgOpacityInput.value = String(clamped);
+  }
+  if (bgOpacityValue) {
+    bgOpacityValue.textContent = `${clamped}%`;
+  }
+}
+
+function handleBgImageChange() {
+  if (!bgImageInput || !bgImageInput.files || bgImageInput.files.length === 0) {
+    return;
+  }
+
+  const file = bgImageInput.files[0];
+  if (!file.type.startsWith("image/")) {
+    alert("画像ファイルを選択してください。");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target?.result;
+    if (typeof dataUrl === "string") {
+      applyBackgroundImage(dataUrl);
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyBackgroundImage(dataUrl) {
+  document.documentElement.style.setProperty("--bg-image", `url(${dataUrl})`);
+  if (bgLayer) bgLayer.classList.add("has-image");
+  if (resultCard) resultCard.classList.add("has-bg-image");
+  if (clearBgButton) clearBgButton.removeAttribute("disabled");
+  updateBgOpacity(bgOpacityInput ? bgOpacityInput.value : 80);
+}
+
+function clearBgImage() {
+  document.documentElement.style.setProperty("--bg-image", "none");
+  if (bgLayer) bgLayer.classList.remove("has-image");
+  if (resultCard) resultCard.classList.remove("has-bg-image");
+  if (clearBgButton) clearBgButton.setAttribute("disabled", "true");
+  updateBgOpacity(bgOpacityInput ? bgOpacityInput.value : 80);
 }
 
 // テーマ適用
