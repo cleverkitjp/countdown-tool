@@ -10,7 +10,7 @@
   --border-soft: #dde5ee;
   --bg-image: none;
   --bg-opacity: 0.25;
-  --card-opacity: 0.88;
+  --card-opacity: 1;
 
   --shadow-soft: 0 6px 14px rgba(0, 0, 0, 0.04);
 }
