@@ -17,6 +17,7 @@
   <!-- 簡易説明 -->
   <meta name="description" content="記念日・イベントまでの「あと何日？」をスマホだけでサクッと表示できる日数カウントツールです。運動会・誕生日・受験・ライブ・推し活・家族旅行などにどうぞ。">
 
+  <link rel="stylesheet" href="https://cleverkitjp.github.io/common.css">
   <link rel="stylesheet" href="style.css">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9727255179923866" crossorigin="anonymous"></script>
 
@@ -144,17 +145,26 @@
       </section>
     </main>
 
-    <footer id="commonFooter" class="footer-placeholder">
-      <!-- 共通フッターを script.js から読み込み -->
-      <p class="back-to-top">
-       <a href="https://cleverkitjp.github.io/">cleverkitjp トップページへ戻る</a>
-      </p>
-    </footer>
   </div>
 
   <!-- 結果カードを画像化するためのライブラリ -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <!-- v=3 でキャッシュクリア -->
   <script src="script.js?v=3"></script>
+  <div id="ck-footer-container"></div>
+  <script>
+    (function() {
+      var container = document.getElementById('ck-footer-container');
+      if (!container) return;
+
+      fetch('https://cleverkitjp.github.io/footer.html')
+        .then(function(r) { return r.text(); })
+        .then(function(html) {
+          container.innerHTML = html;
+          try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+        })
+        .catch(function(e) {});
+    })();
+  </script>
 </body>
 </html>
